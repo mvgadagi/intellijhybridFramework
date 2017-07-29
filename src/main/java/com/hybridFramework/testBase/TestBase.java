@@ -5,12 +5,20 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class TestBase {
 
@@ -21,33 +29,42 @@ public class TestBase {
 
 	public void getBrowser(String browser) {
 
-		System.out.println(System.getProperty("user.dir"));
-		if (System.getProperty("os.name").contains("Window")) {
-			if (browser.equalsIgnoreCase("firefox")) {
-				System.setProperty("webdriver.gecko.driver",
-						System.getProperty("user.dir") + "/drivers/geckodriver.exe");
-			} else if (browser.equalsIgnoreCase("chrome")) {
-				System.setProperty("webdriver.chrome.driver",
-						System.getProperty("usr.dir") + "/drivers/chromedriver.exe");
+		if (System.getProperty("os.name").contains("Window"))
+			{
+				if (browser.equalsIgnoreCase("firefox"))
+					{
+						System.setProperty("webdriver.gecko.driver",
+								System.getProperty("user.dir") + "/drivers/geckodriver.exe");
+					}
+				else if (browser.equalsIgnoreCase("chrome"))
+					{
+						System.setProperty("webdriver.chrome.driver",
+								System.getProperty("usr.dir") + "/drivers/chromedriver.exe");
+					}
 			}
-		}
 
-		else if (System.getProperty("os.name").contains("Mac")) {
-			if (browser.equalsIgnoreCase("firefox")) {
-				System.setProperty("webdriver.firefox.marionette",
-						System.getProperty("user.dir") + "/drivers/geckodriver");
-			} else if (browser.equalsIgnoreCase("chrome")) {
-				System.setProperty("webdriver.chrome.driver", System.getProperty("usr.dir") + "/drivers/chromedriver");
+		else if (System.getProperty("os.name").contains("Mac"))
+			{
+				if (browser.equalsIgnoreCase("firefox"))
+					{
+						System.setProperty("webdriver.firefox.marionette",
+								System.getProperty("user.dir") + "/drivers/geckodriver");
+					}
+				else if (browser.equalsIgnoreCase("chrome"))
+					{
+						System.setProperty("webdriver.chrome.driver",
+								System.getProperty("usr.dir") + "/drivers/chromedriver");
+					}
 			}
-		}
 
 	}
 
 	public void getScreenshot(String imageName) throws IOException {
 
-		if (imageName.equals("")) {
-			imageName = "blank";
-		}
+		if (imageName.equals(""))
+			{
+				imageName = "blank";
+			}
 		File image = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 		String imageLocation = System.getProperty("user.dir") + "\\src\\main\\java\\com\\hybridFramework\\screenshot\\";
 		Calendar calendar = Calendar.getInstance();
@@ -70,14 +87,128 @@ public class TestBase {
 				System.getProperty("user.dir") + "\\src\\main\\java\\com\\hybridFramework\\config\\or.properties");
 		file = new FileInputStream(f1);
 		OR.load(file);
+
+		f1 = new File(System.getProperty("user.dir")
+				+ "\\src\\main\\java\\com\\hybridFramework\\properties\\homepage.properties");
+		file = new FileInputStream(f1);
+		OR.load(file);
 	}
 
-	public static void main(String[] args) throws IOException {
+	public WebElement waitForElement(WebDriver driver, long time, WebElement element) {
+		WebDriverWait wait = new WebDriverWait(driver, time);
+		return wait.until(ExpectedConditions.elementToBeClickable(element));
+
+	}
+
+	public WebElement waitForElementWithPollingInterval(WebDriver driver, long time, WebElement element) {
+
+		WebDriverWait wait = new WebDriverWait(driver, time);
+		wait.pollingEvery(5, TimeUnit.SECONDS);
+		wait.ignoring(NoSuchElementException.class);
+		return wait.until(ExpectedConditions.elementToBeClickable(element));
+
+	}
+
+	public void impliciteWait(long time) {
+		driver.manage().timeouts().implicitlyWait(time, TimeUnit.SECONDS);
+	}
+
+	public WebElement getLocator(String locator) throws Exception {
+		String[] split = locator.split(":");
+		String locatorType = split[0];
+		String locatorValue = split[1];
+
+		if (locatorType.toLowerCase().equals("id"))
+			{
+				return driver.findElement(By.id(locatorValue));
+			}
+		else if (locatorType.toLowerCase().equals("name"))
+			{
+				return driver.findElement(By.name(locatorValue));
+			}
+		else if ((locatorType.toLowerCase().equals("classname")) || (locatorType.toLowerCase().equals("class")))
+			{
+				return driver.findElement(By.className(locatorValue));
+			}
+		else if ((locatorType.toLowerCase().equals("tagname")) || (locatorType.toLowerCase().equals("tag")))
+			{
+				return driver.findElement(By.tagName(locatorValue));
+			}
+		else if ((locatorType.toLowerCase().equals("linktext")) || (locatorType.toLowerCase().equals("link")))
+			{
+				return driver.findElement(By.linkText(locatorValue));
+			}
+		else if (locatorType.toLowerCase().equals("partiallinktext"))
+			{
+				return driver.findElement(By.partialLinkText(locatorValue));
+			}
+		else if ((locatorType.toLowerCase().equals("cssselector")) || (locatorType.toLowerCase().equals("css")))
+			{
+				return driver.findElement(By.cssSelector(locatorValue));
+			}
+		else if (locatorType.toLowerCase().equals("xpath"))
+			{
+				return driver.findElement(By.xpath(locatorValue));
+			}
+		else
+			throw new Exception("'Unknown locator Type '" + locatorType + "'");
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<WebElement> getLocators(String locator) throws Exception {
+		String[] split = locator.split(":");
+		String locatorType = split[0];
+		String locatorValue = split[1];
+
+		if (locatorType.toLowerCase().equals("id"))
+
+			return (List<WebElement>) driver.findElement(By.id(locatorValue));
+
+		else if (locatorType.toLowerCase().equals("name"))
+
+			return (List<WebElement>) driver.findElement(By.name(locatorValue));
+
+		else if ((locatorType.toLowerCase().equals("classname")) || (locatorType.toLowerCase().equals("class")))
+			{
+				return (List<WebElement>) driver.findElement(By.className(locatorValue));
+			}
+		else if ((locatorType.toLowerCase().equals("tagname")) || (locatorType.toLowerCase().equals("tag")))
+			{
+				return (List<WebElement>) driver.findElement(By.tagName(locatorValue));
+			}
+		else if ((locatorType.toLowerCase().equals("linktext")) || (locatorType.toLowerCase().equals("link")))
+			{
+				return (List<WebElement>) driver.findElement(By.linkText(locatorValue));
+			}
+		else if (locatorType.toLowerCase().equals("partiallinktext"))
+			{
+				return (List<WebElement>) driver.findElement(By.partialLinkText(locatorValue));
+			}
+		else if ((locatorType.toLowerCase().equals("cssselector")) || (locatorType.toLowerCase().equals("css")))
+			{
+				return (List<WebElement>) driver.findElement(By.cssSelector(locatorValue));
+			}
+		else if (locatorType.toLowerCase().equals("xpath"))
+			{
+				return (List<WebElement>) driver.findElement(By.xpath(locatorValue));
+			}
+		else
+			throw new Exception("'Unknown locator Type '" + locatorType + "'");
+	}
+
+	public WebElement getWebElement(String locator) throws Exception {
+		return getLocator(OR.getProperty(locator));
+	}
+
+	public List<WebElement> getWebElements(String locator) throws Exception {
+		return getLocators(OR.getProperty(locator));
+	}
+
+	public static void main(String[] args) throws Exception {
 
 		TestBase test = new TestBase();
-		test.getBrowser("firefox");
 		test.loadPropertiesFile();
-		System.out.println(test.OR.getProperty("Name"));
+		test.getWebElements("password");
 	}
 
 }

@@ -1,10 +1,19 @@
 package com.hybridFramework.testBase;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Properties;
+
 import org.openqa.selenium.WebDriver;
 
 public class TestBase {
 
-	WebDriver driver;
+	public WebDriver driver;
+	public Properties OR;
+	public File f1;
+	public FileInputStream file;
 
 	public void getBrowser(String browser) {
 
@@ -30,14 +39,26 @@ public class TestBase {
 
 	}
 
-	public void loadPropertiesFile() {
+	public void loadPropertiesFile() throws IOException {
 
+		OR = new Properties();
+		f1 = new File(
+				System.getProperty("user.dir") + "\\src\\main\\java\\com\\hybridFramework\\config\\config.properties");
+		file = new FileInputStream(f1);
+		OR.load(file);
+
+		f1 = new File(
+				System.getProperty("user.dir") + "\\src\\main\\java\\com\\hybridFramework\\config\\or.properties");
+		file = new FileInputStream(f1);
+		OR.load(file);
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 
 		TestBase test = new TestBase();
 		test.getBrowser("firefox");
+		test.loadPropertiesFile();
+		System.out.println(test.OR.getProperty("Name"));
 	}
 
 }

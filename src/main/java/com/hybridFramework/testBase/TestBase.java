@@ -30,6 +30,10 @@ public class TestBase {
 
 	}
 
+	public void loadPropertiesFile() {
+
+	}
+
 	public static void main(String[] args) {
 
 		TestBase test = new TestBase();

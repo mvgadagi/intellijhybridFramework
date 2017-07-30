@@ -3,6 +3,7 @@ package com.hybridFramework.testBase;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
@@ -21,8 +22,15 @@ import org.openqa.selenium.WebElement;
 
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.ITestResult;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 
 import com.hybridFramework.excelReader.Excel_reader;
+import com.relevantcodes.extentreports.ExtentReports;
+import com.relevantcodes.extentreports.ExtentTest;
+import com.relevantcodes.extentreports.LogStatus;
 
 public class TestBase {
 
@@ -32,6 +40,52 @@ public class TestBase {
 	public File f1;
 	public FileInputStream file;
 	public Excel_reader excelReader;
+
+	public static ExtentReports extent;
+	public static ExtentTest test;
+
+	static {
+		Calendar calender = Calendar.getInstance();
+		SimpleDateFormat format = new SimpleDateFormat("MM_dd_yyyy_hh_mm_ss");
+		extent = new ExtentReports(System.getProperty("user.dir") + "\\src\\main\\java\\com\\hybridFramework\\report\\"
+				+ format.format(calender.getTime()) + ".html", false);
+
+	}
+
+	public void getResult(ITestResult result) {
+		if (result.getStatus() == ITestResult.SUCCESS) {
+			test.log(LogStatus.PASS, result.getName() + "Test Is Pass");
+		}
+		else if (result.getStatus() == ITestResult.SKIP) {
+			test.log(LogStatus.SKIP,
+					result.getName() + "Test Is Skipped because of the reason " + result.getThrowable());
+		}
+		else if (result.getStatus() == ITestResult.FAILURE) {
+			test.log(LogStatus.FAIL,
+					result.getName() + "Test Is Failed because of the reason " + result.getThrowable());
+		}
+		else if (result.getStatus() == ITestResult.STARTED) {
+			test.log(LogStatus.INFO, result.getName() + "Test Is Started");
+		}
+
+	}
+
+	@BeforeMethod()
+	public void beforeMethod(Method result) {
+		test = extent.startTest(result.getName());
+		test.log(LogStatus.INFO, result.getName() + "Test Is Started");
+	}
+
+	@AfterMethod()
+	public void afterMethod(ITestResult result) {
+		getResult(result);
+	}
+
+	@AfterClass(alwaysRun = true)
+	public void endTest() {
+		extent.endTest(test);
+		extent.flush();
+	}
 
 	public void getBrowser(String browser) {
 

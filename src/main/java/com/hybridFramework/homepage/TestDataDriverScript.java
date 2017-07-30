@@ -5,6 +5,8 @@ import org.testng.annotations.Test;
 
 import com.hybridFramework.testBase.TestBase;
 
+import junit.framework.Assert;
+
 public class TestDataDriverScript extends TestBase {
 
 	@DataProvider(name = "testData")
@@ -17,5 +19,15 @@ public class TestDataDriverScript extends TestBase {
 		System.out.println("username : " + userName);
 		System.out.println("password : " + password);
 		System.out.println("runMode : " + runMode);
+	}
+
+	@Test
+	public void testFailure() {
+		Assert.fail();
+	}
+
+	@Test
+	public void skipMethod() {
+		System.out.println("Skipping Test!!");
 	}
 }

@@ -1,11 +1,12 @@
 package com.hybridFramework.homepage;
 
+import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.hybridFramework.testBase.TestBase;
 
-import junit.framework.Assert;
+
 
 public class TestDataDriverScript extends TestBase {
 

@@ -10,6 +10,8 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.OutputType;
@@ -24,6 +26,7 @@ import com.hybridFramework.excelReader.Excel_reader;
 
 public class TestBase {
 
+	public static final Logger logger = Logger.getLogger(TestBase.class.getName());
 	public WebDriver driver;
 	public Properties OR;
 	public File f1;
@@ -72,21 +75,27 @@ public class TestBase {
 
 	public void loadPropertiesFile() throws IOException {
 
+		String log4jConfPath = "log4j.properties";
+		PropertyConfigurator.configure(log4jConfPath);
+
 		OR = new Properties();
 		f1 = new File(
 				System.getProperty("user.dir") + "\\src\\main\\java\\com\\hybridFramework\\config\\config.properties");
 		file = new FileInputStream(f1);
 		OR.load(file);
+		logger.info("Loaded the Property File : " + f1);
 
 		f1 = new File(
 				System.getProperty("user.dir") + "\\src\\main\\java\\com\\hybridFramework\\config\\or.properties");
 		file = new FileInputStream(f1);
 		OR.load(file);
+		logger.info("Loaded the Property File : " + f1);
 
 		f1 = new File(System.getProperty("user.dir")
 				+ "\\src\\main\\java\\com\\hybridFramework\\properties\\homepage.properties");
 		file = new FileInputStream(f1);
 		OR.load(file);
+		logger.info("Loaded the Property File : " + f1);
 	}
 
 	public WebElement waitForElement(WebDriver driver, long time, WebElement element) {

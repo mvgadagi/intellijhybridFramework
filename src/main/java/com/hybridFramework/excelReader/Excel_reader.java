@@ -31,7 +31,6 @@ public class Excel_reader {
 
 			while (rowIterator.hasNext()) {
 				Row row = rowIterator.next();
-
 				if (i++ != 0) {
 					int k = t;
 					t++;
@@ -68,6 +67,8 @@ public class Excel_reader {
 								dataSets[k][j++] = cell.getStringCellValue();
 								System.out.println(cell.getStringCellValue());
 								break;
+							default:
+								dataSets[k][j++] = cell.getStringCellValue();
 						}
 					}
 
